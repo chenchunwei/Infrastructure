@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C50B79EF-2006-453D-8238-79CD7E5BBACC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Fluent.Infrastructure</RootNamespace>
+    <AssemblyName>Fluent.Infrastructure</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aspose.Cells">
+      <HintPath>..\ExternalAssembly\Aspose\Aspose.Cells.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentNHibernate">
+      <HintPath>..\ExternalAssembly\FluentNhibernate\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\ExternalAssembly\Nhibernate\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\ExternalAssembly\Log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\ExternalAssembly\JSON.NET\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\ExternalAssembly\Nhibernate\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\IAggregateRoot.cs" />
+    <Compile Include="Domain\IRepository.cs" />
+    <Compile Include="Domain\NhibernateRepository\AbstractNhibernateRepository.cs" />
+    <Compile Include="Domain\NhibernateRepository\AbstractOracleNhibernateRepository.cs" />
+    <Compile Include="Domain\NhibernateRepository\DefaultSessionFactoryHelper.cs" />
+    <Compile Include="Domain\NhibernateRepository\DefaultSessionManagerFactory.cs" />
+    <Compile Include="Domain\NhibernateRepository\ISessionManager.cs" />
+    <Compile Include="Domain\NhibernateRepository\ISessionManagerFactory.cs" />
+    <Compile Include="Domain\NhibernateRepository\OracleSessionFactoryHelper.cs" />
+    <Compile Include="Domain\NhibernateRepository\ThreadSessionManager.cs" />
+    <Compile Include="Domain\NhibernateRepository\WebSessionManager.cs" />
+    <Compile Include="Domain\ValueObject.cs" />
+    <Compile Include="Excel\ExcelService.cs" />
+    <Compile Include="Log\DefaultLoggerFactory.cs" />
+    <Compile Include="Log\ILoggerFactory.cs" />
+    <Compile Include="Mvc\BaseController.cs" />
+    <Compile Include="Mvc\NewtonsoftJsonResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceLocation\Configuration\ServiceConfigurationElement.cs" />
+    <Compile Include="ServiceLocation\Configuration\ServiceConfigurationElementCollection.cs" />
+    <Compile Include="ServiceLocation\Configuration\ServiceSection.cs" />
+    <Compile Include="ServiceLocation\ServiceLocationConst.cs" />
+    <Compile Include="ServiceLocation\ServiceLocationHandler.cs" />
+    <Compile Include="Utilities\DesCrypto.cs" />
+    <Compile Include="Utilities\EnumHelper.cs" />
+    <Compile Include="Utilities\MD5Utility.cs" />
+    <Compile Include="Utilities\MyString.cs" />
+    <Compile Include="Utilities\TypeParse.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Domain\NhibernateRepository\Demo\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
