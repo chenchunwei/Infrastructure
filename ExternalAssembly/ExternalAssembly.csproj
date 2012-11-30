@@ -50,6 +50,7 @@
     <Content Include="JSON.NET\Newtonsoft.Json.dll" />
     <Content Include="JSON.NET\Newtonsoft.Json.pdb" />
     <Content Include="JSON.NET\Newtonsoft.Json.xml" />
+    <Content Include="Log4net\log4mail.txt" />
     <Content Include="Log4net\log4net.dll" />
     <Content Include="Log4net\log4net.xml" />
     <Content Include="PetaPoco\PetaPoco.dll" />

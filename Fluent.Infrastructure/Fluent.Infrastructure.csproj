@@ -72,6 +72,7 @@
     <Compile Include="Domain\NhibernateRepository\ISessionManagerFactory.cs" />
     <Compile Include="Domain\NhibernateRepository\OracleSessionFactoryHelper.cs" />
     <Compile Include="Domain\NhibernateRepository\ThreadSessionManager.cs" />
+    <Compile Include="Domain\NhibernateRepository\TransactionManager.cs" />
     <Compile Include="Domain\NhibernateRepository\WebSessionManager.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Excel\ExcelService.cs" />
