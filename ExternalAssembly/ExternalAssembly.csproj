@@ -61,6 +61,22 @@
     <Content Include="Nhibernate\NHibernate.dll" />
     <Content Include="Nhibernate\NHibernate.pdb" />
     <Content Include="Nhibernate\NHibernate.xml" />
+    <Content Include="Quartz.Net\C5.dll" />
+    <Content Include="Quartz.Net\ClientProfile\Quartz.dll" />
+    <Content Include="Quartz.Net\ClientProfile\Quartz.pdb" />
+    <Content Include="Quartz.Net\ClientProfile\Quartz.xml" />
+    <Content Include="Quartz.Net\Common.Logging.dll" />
+    <Content Include="Quartz.Net\Quartz.dll" />
+    <Content Include="Quartz.Net\Quartz.Net\C5.dll" />
+    <Content Include="Quartz.Net\Quartz.Net\ClientProfile\Quartz.dll" />
+    <Content Include="Quartz.Net\Quartz.Net\ClientProfile\Quartz.pdb" />
+    <Content Include="Quartz.Net\Quartz.Net\ClientProfile\Quartz.xml" />
+    <Content Include="Quartz.Net\Quartz.Net\Common.Logging.dll" />
+    <Content Include="Quartz.Net\Quartz.Net\Quartz.dll" />
+    <Content Include="Quartz.Net\Quartz.Net\Quartz.pdb" />
+    <Content Include="Quartz.Net\Quartz.Net\Quartz.xml" />
+    <Content Include="Quartz.Net\Quartz.pdb" />
+    <Content Include="Quartz.Net\Quartz.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PetaPoco\PetaPoco.dll.config" />

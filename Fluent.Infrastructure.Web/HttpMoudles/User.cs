@@ -5,9 +5,10 @@ using System.Text;
 
 namespace Fluent.Infrastructure.Web.HttpMoudles
 {
-    public interface IUser
+    public class User
     {
-        string Account { get; set; }
-        string Pwd { get; set; }
+        public Guid Id { get; set; }
+        public string Account { get; set; }
+        public string Pwd { get; set; }
     }
 }

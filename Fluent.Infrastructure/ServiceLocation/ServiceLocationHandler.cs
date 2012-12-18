@@ -9,10 +9,11 @@ namespace Fluent.Infrastructure.ServiceLocation
 {
     public class ServiceLocationHandler
     {
-        private ServiceLocationHandler(){}
+        private ServiceLocationHandler() { }
         public static readonly object Locker = new object();
         private static readonly Dictionary<Type, object> ServiceStore = new Dictionary<Type, object>();
         public static T Resolver<T>()
+            where T : class
         {
             var type = typeof(T);
             if (!ServiceStore.ContainsKey(type))
@@ -21,10 +22,21 @@ namespace Fluent.Infrastructure.ServiceLocation
                 {
                     if (!ServiceStore.ContainsKey(type))
                     {
-                        var services = (ServiceSection)ConfigurationManager.GetSection(ServiceLocationConst.ServiceSetionName);
-                        var service = Activator.CreateInstance<T>();
-                        if (service == null)
-                            throw new ArgumentException(string.Format("未找到{0}类型的服务配置节点！", type.ToString()));
+                        var serviceSection = (ServiceSection)ConfigurationManager.GetSection(ServiceLocationConst.ServiceSetionName);
+                        foreach (ServiceConfigurationElement element in serviceSection.Services)
+                        {
+                            if (!string.Equals(type.ToString(), element.Key, StringComparison.CurrentCultureIgnoreCase))
+                                continue;
+                            if (element.ClassName.IndexOf(",", StringComparison.CurrentCultureIgnoreCase) == -1)
+                                element.ClassName += "," + serviceSection.AssemblyName;
+                            var classInfos = element.ClassName.Split(new[] { ',' });
+                            var typeTarget = Type.GetType(element.ClassName);
+                            if (typeTarget == null)
+                                throw new ArgumentException(element.ClassName + "无法初始化");
+                            var service = Activator.CreateInstance(typeTarget) as T;
+                            ServiceStore[type] = service;
+                            break;
+                        }
                     }
                 }
             }

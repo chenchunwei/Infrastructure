@@ -16,7 +16,7 @@ namespace Fluent.Infrastructure.ServiceLocation.Configuration
         }
 
         [ConfigurationProperty(ServiceLocationConst.ServiceCollectionName, IsRequired = false)]
-        public ServiceConfigurationElementCollection IgnorePaths
+        public ServiceConfigurationElementCollection Services
         {
             get { return (ServiceConfigurationElementCollection)(base[ServiceLocationConst.ServiceCollectionName]); }
             set { this[ServiceLocationConst.ServiceCollectionName] = value; }

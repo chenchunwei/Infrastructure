@@ -50,7 +50,8 @@
   <ItemGroup>
     <Compile Include="HttpFiles\FileHelper.cs" />
     <Compile Include="HttpFiles\HttpFileInfo.cs" />
-    <Compile Include="HttpMoudles\IUser.cs" />
+    <Compile Include="HttpMoudles\HttpMoudlesConst.cs" />
+    <Compile Include="HttpMoudles\User.cs" />
     <Compile Include="HttpMoudles\IUserService.cs" />
     <Compile Include="HttpMoudles\Configuration\AuthencationSection.cs" />
     <Compile Include="HttpMoudles\AuthenticationClinet.cs" />

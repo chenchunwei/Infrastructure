@@ -19,8 +19,8 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
     public class AuthenticationHttpMoudle : IHttpModule
     {
         private ILog _logger;
-        private const string HttpUserKey = "______httpUser______";
-        private readonly IUserService _userService;
+       
+        private IUserService _userService;
         private readonly DesCrypto _desCrypto;
 
         public AuthenticationHttpMoudle()
@@ -77,35 +77,43 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
                 if (!httpContext.Request.Url.AbsolutePath.Equals(LoginUrl.Replace("~", ""), StringComparison.CurrentCultureIgnoreCase))
                     RedirectToLoginUrl();
             }
-            else if (httpContext.Request.Cookies["CorpId"] != null)
+            else
             {
+                //HACK:问题，当用户已登录的时候再登入的时候，会多次加载用户信息。这个需要修正，而且比较麻烦
                 LoadUserProfie(accountCookie);
             }
         }
 
         private bool IsInIgronSettings(HttpRequest request)
         {
+            _logger.DebugFormat("正校验地址{0}是否在忽略列表中", request.Url.AbsolutePath);
             var section = ConfigurationManager.GetSection("AuthencationSection") as AuthencationSection;
             if (section == null)
                 throw new ConfigurationErrorsException("web.config中必须配置AuthencationSection节点信息");
             var isIngronePath = section.IgnorePaths.Cast<IgnorePathConfigurationElement>()
-                .Any(igrone => request.Url.AbsolutePath.Trim() == "/" || request.Url.AbsolutePath.StartsWith(igrone.Path.Replace("~", ""), StringComparison.CurrentCultureIgnoreCase));
+                .Any(igrone => request.Url.AbsolutePath.StartsWith(igrone.Path.Replace("~", ""), StringComparison.CurrentCultureIgnoreCase));
             if (!isIngronePath)
                 return section.IgnorePostfixs.Cast<IgnorePostfixConfigurationElement>()
                    .Any(igronePostfix =>
                        request.FilePath
                        .EndsWith(igronePostfix.Postfix, StringComparison.CurrentCultureIgnoreCase));
+            _logger.DebugFormat("地址{0}存在于忽略列表中", request.Url.AbsolutePath);
             return true;
         }
 
         private void LoadUserProfie(HttpCookie accountCookie)
         {
             var httpContext = HttpContext.Current;
-            var user = _userService.GetAuthencationUser(_desCrypto.Decryptor(accountCookie.Value));
+            var accountName = _desCrypto.Decryptor(accountCookie.Value);
+            var user = _userService.GetAuthencationUser(accountName);
             if (user != null)
-                httpContext.Items[HttpUserKey] = user;
+            {
+                httpContext.Items[HttpMoudlesConst.HttpUserKey] = user;
+                _logger.DebugFormat("用户信息正常加载，用户名：{0},请求地址：{1}", accountName, httpContext.Request.Url.AbsolutePath);
+            }
             else
             {
+                _logger.DebugFormat("用户加载失败，将进行跳转，用户名：{0}", accountName);
                 RemoveLoginCookie(httpContext, accountCookie);
                 RedirectToLoginUrl();
             }
@@ -114,7 +122,9 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         private void RedirectToLoginUrl()
         {
             var httpContext = HttpContext.Current;
-            httpContext.Response.Redirect(LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri);
+            var redirectUrl = LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri;
+            _logger.DebugFormat("正跳转到登录页：{0}", redirectUrl);
+            httpContext.Response.Redirect(redirectUrl);
         }
 
         private void Login()
@@ -124,19 +134,31 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             var account = httpContext.Request["account"];
             var password = httpContext.Request["password"];
             var user = _userService.Authencation(account, password);
+            _logger.DebugFormat("正在验证登录信息：{0}", account);
             if (user != null)
             {
-                httpContext.Items[HttpUserKey] = user;
-                var loginCookie = new HttpCookie(LoginCookieKey, _desCrypto.Encryptor(account)) {HttpOnly = true};
+                httpContext.Items[HttpMoudlesConst.HttpUserKey] = user;
+                var loginCookie = new HttpCookie(LoginCookieKey, _desCrypto.Encryptor(account)) { HttpOnly = true };
                 httpContext.Response.Cookies.Add(loginCookie);
-              
+
                 var urlReferrer = httpContext.Request.UrlReferrer;
                 var urlrefInQuery = httpContext.Request["urlReferrer"];
-                var refUrl = urlrefInQuery ?? (urlReferrer != null ? urlReferrer.AbsoluteUri : string.Empty);
+                var refUrl = string.IsNullOrEmpty(urlrefInQuery) ? (urlReferrer != null ? urlReferrer.AbsoluteUri : string.Empty) : string.Empty;
+                _logger.DebugFormat("urlrefInQuery：{0}", urlrefInQuery);
+                _logger.DebugFormat("urlReferrer：{0}", urlReferrer);
+                if (!string.IsNullOrEmpty(refUrl))
+                {
+                    if (refUrl.IndexOf(LoginUrl.Replace("~/", ""), System.StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    {
+                        refUrl = ConvertUrl(HomeUrl);
+                    }
+                }
+                _logger.DebugFormat("正跳转到：{0}", refUrl);
                 httpContext.Response.Redirect(!string.IsNullOrEmpty(refUrl) ? refUrl : ConvertUrl(refUrl));
             }
             else
             {
+                _logger.DebugFormat("用户名密码校验不通过：account={0};pwd={1},跳转到登录页并记录状态", account, password);
                 httpContext.Response.Redirect(LoginUrl + string.Format("?status={0}", "0"));
             }
         }
@@ -145,11 +167,11 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         {
             accountCookie.Expires = DateTime.Now.AddYears(-1);
             httpContext.Response.Cookies.Add(accountCookie);
-            // httpContext.Request.Cookies.Remove(LoginCookieKey);
         }
 
         private void Logout()
         {
+            _logger.DebugFormat("正在执行退出操作！");
             HttpContext httpContext = HttpContext.Current;
             var accountCookie = httpContext.Request.Cookies[LoginCookieKey];
             if (accountCookie != null)
@@ -157,7 +179,9 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
                 RemoveLoginCookie(httpContext, accountCookie);
                 //跳转到新登录页
                 //httpContext.Response.Redirect(LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), ""));
-                httpContext.Response.Redirect(httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), ""));
+                var logoutUrl = httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), "");
+                _logger.DebugFormat("退出成功，正跳转：{0}", logoutUrl);
+                httpContext.Response.Redirect(logoutUrl);
             }
         }
 
@@ -226,7 +250,18 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
                 return str;
             }
         }
-
+        public string HomeUrl
+        {
+            get
+            {
+                var str = System.Configuration.ConfigurationManager.AppSettings["HomeUrl"];
+                if (string.IsNullOrEmpty(str))
+                {
+                    throw new ConfigurationErrorsException("必须配置HomeUrl的AppSettings键值作为默认首页");
+                }
+                return str;
+            }
+        }
         public string LoginCookieKey
         {
             get

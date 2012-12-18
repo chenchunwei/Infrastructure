@@ -7,8 +7,14 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 {
     public class AuthenticationClinet
     {
-        //HACK:出现重复的变量定义了
-        private const string HttpUserKey = "______httpUser______";
-
+        public static User CurrentUser
+        {
+            get
+            {
+                if (HttpContext.Current.Items[HttpMoudlesConst.HttpUserKey] != null)
+                    return HttpContext.Current.Items[HttpMoudlesConst.HttpUserKey] as User;
+                return null;
+            }
+        }
     }
 }

@@ -7,8 +7,8 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 {
     public interface IUserService
     {
-        IUser Authencation(string account, string password);
-        IUser GetAuthencationUser(string account, string password);
-        IUser GetAuthencationUser(string account);
+        User Authencation(string account, string password);
+        User GetAuthencationUser(string account, string password);
+        User GetAuthencationUser(string account);
     }
 }
