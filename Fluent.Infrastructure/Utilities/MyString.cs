@@ -341,6 +341,8 @@ namespace Fluent.Infrastructure.Utilities
             ASCIIEncoding ascii = new ASCIIEncoding();
             int tempLen = 0;
             string tempString = "";
+            if (string.IsNullOrEmpty(str))
+                return string.Empty;
             byte[] s = ascii.GetBytes(str);
             for (int i = 0; i < s.Length; i++)
             {
