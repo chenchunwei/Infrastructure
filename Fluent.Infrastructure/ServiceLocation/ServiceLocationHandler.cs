@@ -3,19 +3,29 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using Fluent.Infrastructure.Log;
 using Fluent.Infrastructure.ServiceLocation.Configuration;
+using log4net;
 
 namespace Fluent.Infrastructure.ServiceLocation
 {
     public class ServiceLocationHandler
     {
+        private static readonly ILog _logger;
+        private static int _times = 0;
+        static ServiceLocationHandler()
+        {
+            _logger = new DefaultLoggerFactory().GetLogger();
+        }
         private ServiceLocationHandler() { }
         public static readonly object Locker = new object();
         private static readonly Dictionary<Type, object> ServiceStore = new Dictionary<Type, object>();
         public static T Resolver<T>()
             where T : class
         {
+            _times++;
             var type = typeof(T);
+            _logger.DebugFormat("ServiceStore当前有{0}个对象,当前第{1}次访问", ServiceStore.Count, _times);
             if (!ServiceStore.ContainsKey(type))
             {
                 lock (Locker)
