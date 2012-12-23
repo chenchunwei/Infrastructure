@@ -19,12 +19,14 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
     public class AuthenticationHttpMoudle : IHttpModule
     {
         private ILog _logger;
-       
-        private IUserService _userService;
+
+        private readonly IUserService _userService;
         private readonly DesCrypto _desCrypto;
 
         public AuthenticationHttpMoudle()
         {
+            _logger = new DefaultLoggerFactory().GetLogger();
+            _logger.DebugFormat("AuthenticationHttpMoudle创建新的实例");
             _userService = ServiceLocationHandler.Resolver<IUserService>();
             _desCrypto = new DesCrypto("hhyjuuhd", "mmnjikjh");
         }
@@ -35,7 +37,6 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 
         public void Init(HttpApplication context)
         {
-            _logger = new DefaultLoggerFactory().GetLogger();
             context.BeginRequest += Handler;
             context.EndRequest += SessionClose;
         }
@@ -47,6 +48,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         }
         public void Handler(object sender, EventArgs args)
         {
+            _logger.DebugFormat("AuthenticationHttpMoudle.Handler被访问，对象实例为{0}", this.GetHashCode());
             HttpContext httpContext = HttpContext.Current;
             if (httpContext == null)
                 throw new ApplicationException("context");
@@ -70,17 +72,18 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             //_logger.InfoFormat("访问页面的绝对地址:" + httpContext.Request.Url.AbsolutePath);
             //判断是否在忽略列表中
             var accountCookie = httpContext.Request.Cookies[LoginCookieKey];
+            var extensionCookie = httpContext.Request.Cookies[LoginExtensionCookieKey];
             if (accountCookie == null)
             {
                 if (IsInIgronSettings(httpContext.Request))
                     return;
-                if (!httpContext.Request.Url.AbsolutePath.Equals(LoginUrl.Replace("~", ""), StringComparison.CurrentCultureIgnoreCase))
+                if (!httpContext.Request.Url.AbsolutePath.Equals(ConvertUrl(LoginUrl), StringComparison.CurrentCultureIgnoreCase))
                     RedirectToLoginUrl();
             }
             else
             {
                 //HACK:问题，当用户已登录的时候再登入的时候，会多次加载用户信息。这个需要修正，而且比较麻烦
-                LoadUserProfie(accountCookie);
+                LoadUserProfie(accountCookie, extensionCookie);
             }
         }
 
@@ -91,7 +94,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             if (section == null)
                 throw new ConfigurationErrorsException("web.config中必须配置AuthencationSection节点信息");
             var isIngronePath = section.IgnorePaths.Cast<IgnorePathConfigurationElement>()
-                .Any(igrone => request.Url.AbsolutePath.StartsWith(igrone.Path.Replace("~", ""), StringComparison.CurrentCultureIgnoreCase));
+                .Any(igrone => request.Url.AbsolutePath.StartsWith(ConvertUrl(igrone.Path), StringComparison.CurrentCultureIgnoreCase));
             if (!isIngronePath)
                 return section.IgnorePostfixs.Cast<IgnorePostfixConfigurationElement>()
                    .Any(igronePostfix =>
@@ -101,11 +104,11 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             return true;
         }
 
-        private void LoadUserProfie(HttpCookie accountCookie)
+        private void LoadUserProfie(HttpCookie accountCookie, HttpCookie extensionCookie)
         {
             var httpContext = HttpContext.Current;
             var accountName = _desCrypto.Decryptor(accountCookie.Value);
-            var user = _userService.GetAuthencationUser(accountName);
+            var user = _userService.GetAuthencationUser(accountName, extensionCookie == null ? "" : extensionCookie.Value);
             if (user != null)
             {
                 httpContext.Items[HttpMoudlesConst.HttpUserKey] = user;
@@ -114,7 +117,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             else
             {
                 _logger.DebugFormat("用户加载失败，将进行跳转，用户名：{0}", accountName);
-                RemoveLoginCookie(httpContext, accountCookie);
+                RemoveLoginCookie(httpContext, accountCookie, extensionCookie);
                 RedirectToLoginUrl();
             }
         }
@@ -133,13 +136,16 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             var httpContext = HttpContext.Current;
             var account = httpContext.Request["account"];
             var password = httpContext.Request["password"];
-            var user = _userService.Authencation(account, password);
+            var extension = httpContext.Request["extension"];
+            var user = _userService.Authencation(account, password, extension);
             _logger.DebugFormat("正在验证登录信息：{0}", account);
             if (user != null)
             {
                 httpContext.Items[HttpMoudlesConst.HttpUserKey] = user;
                 var loginCookie = new HttpCookie(LoginCookieKey, _desCrypto.Encryptor(account)) { HttpOnly = true };
+                var loginExtensionCookie = new HttpCookie(LoginExtensionCookieKey, extension) { HttpOnly = true };
                 httpContext.Response.Cookies.Add(loginCookie);
+                httpContext.Response.Cookies.Add(loginExtensionCookie);
 
                 var urlReferrer = httpContext.Request.UrlReferrer;
                 var urlrefInQuery = httpContext.Request["urlReferrer"];
@@ -163,10 +169,15 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             }
         }
 
-        private void RemoveLoginCookie(HttpContext httpContext, HttpCookie accountCookie)
+        private static void RemoveLoginCookie(HttpContext httpContext, HttpCookie accountCookie, HttpCookie loginExtensionCookie)
         {
             accountCookie.Expires = DateTime.Now.AddYears(-1);
             httpContext.Response.Cookies.Add(accountCookie);
+            if (loginExtensionCookie != null)
+            {
+                loginExtensionCookie.Expires = DateTime.Now.AddYears(-1);
+                httpContext.Response.Cookies.Add(loginExtensionCookie);
+            }
         }
 
         private void Logout()
@@ -174,9 +185,10 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             _logger.DebugFormat("正在执行退出操作！");
             HttpContext httpContext = HttpContext.Current;
             var accountCookie = httpContext.Request.Cookies[LoginCookieKey];
+            var loginExtensionCookie = httpContext.Request.Cookies[LoginExtensionCookieKey];
             if (accountCookie != null)
             {
-                RemoveLoginCookie(httpContext, accountCookie);
+                RemoveLoginCookie(httpContext, accountCookie, loginExtensionCookie);
                 //跳转到新登录页
                 //httpContext.Response.Redirect(LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), ""));
                 var logoutUrl = httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), "");
@@ -191,11 +203,13 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             return regex.Replace(url, string.Empty).Replace("?&", "?");
         }
 
-        private string ConvertUrl(string path)
+        private static string ConvertUrl(string path)
         {
             var virtualPath = HostingEnvironment.ApplicationHost.GetVirtualPath();
             if (path.StartsWith("~/"))
             {
+                if (!virtualPath.EndsWith("/"))
+                    virtualPath = virtualPath + "/";
                 return virtualPath + path.TrimStart(new char[] { '~', '/' });
             }
             return path;
@@ -269,6 +283,14 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
                 var loginCookieKey = System.Configuration.ConfigurationManager.AppSettings["LoginCookieKey"];
                 return !string.IsNullOrEmpty(loginCookieKey) ? loginCookieKey : "accountKey";
 
+            }
+        }
+        public string LoginExtensionCookieKey
+        {
+            get
+            {
+                var loginCookieKey = System.Configuration.ConfigurationManager.AppSettings["LoginExtensionCookieKey"];
+                return !string.IsNullOrEmpty(loginCookieKey) ? loginCookieKey : "loginExtension";
             }
         }
 
