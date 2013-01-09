@@ -88,6 +88,14 @@
     <Compile Include="ServiceLocation\ServiceLocationHandler.cs" />
     <Compile Include="Utilities\DesCrypto.cs" />
     <Compile Include="Utilities\EnumHelper.cs" />
+    <Compile Include="Utilities\ImageUtilities\ColorHelper.cs" />
+    <Compile Include="Utilities\ImageUtilities\DefaultThumbnailNameProvider.cs" />
+    <Compile Include="Utilities\ImageUtilities\GraphFillModel.cs" />
+    <Compile Include="Utilities\ImageUtilities\ImageUtility.cs" />
+    <Compile Include="Utilities\ImageUtilities\IThumbnailNameProvider.cs" />
+    <Compile Include="Utilities\ImageUtilities\ThumbnailFileInfo.cs" />
+    <Compile Include="Utilities\ImageUtilities\ThumbnailProperty.cs" />
+    <Compile Include="Utilities\ImageUtilities\ZoomModel.cs" />
     <Compile Include="Utilities\MD5Utility.cs" />
     <Compile Include="Utilities\MyString.cs" />
     <Compile Include="Utilities\TypeParse.cs" />
