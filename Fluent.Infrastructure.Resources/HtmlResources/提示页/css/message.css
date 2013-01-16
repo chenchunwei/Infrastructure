@@ -1,0 +1,16 @@
+﻿body {
+background: #ddeded url(../images/bg-pattern-plain.jpg) top left;
+color: #323739;
+font: normal 12px helvetica, arial, sans-serif;
+min-width: 420px;
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, p, blockquote, th {
+margin: 0;
+padding: 0;
+}
+img {
+border: 0px;
+margin: 0;
+padding: 0;
+}

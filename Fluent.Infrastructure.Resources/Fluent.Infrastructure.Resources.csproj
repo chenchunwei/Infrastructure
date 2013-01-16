@@ -80,6 +80,14 @@
     <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="HtmlResources\404\404.htm" />
+    <Content Include="HtmlResources\404\css\404.css" />
+    <Content Include="HtmlResources\404\images\clouds1.png" />
+    <Content Include="HtmlResources\404\images\clouds2.png" />
+    <Content Include="HtmlResources\404\images\raindrops2.png" />
+    <Content Include="HtmlResources\404\images\raindrops3.png" />
+    <Content Include="HtmlResources\404\images\sign.png" />
+    <Content Include="HtmlResources\404\jquery-1.7.2.min.js" />
     <Content Include="HtmlResources\Content\css\buttom.css" />
     <Content Include="HtmlResources\Content\css\icons.css" />
     <Content Include="HtmlResources\Content\css\opa-icons.css" />
@@ -112,6 +120,12 @@
     <Content Include="HtmlResources\Scripts\jquery-1.8.0.min.js" />
     <Content Include="HtmlResources\Scripts\Keyfilter\jquery.keyfilter-1.7.js" />
     <Content Include="HtmlResources\Scripts\Keyfilter\jquery.masker.js" />
+    <Content Include="HtmlResources\submenu.htm" />
+    <Content Include="HtmlResources\提示页\css\message.css" />
+    <Content Include="HtmlResources\提示页\images\500.png" />
+    <Content Include="HtmlResources\提示页\images\bg-pattern-plain.jpg" />
+    <Content Include="HtmlResources\提示页\jquery-1.7.2.min.js" />
+    <Content Include="HtmlResources\提示页\Message.htm" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -148,6 +162,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="HtmlResources\Content\glyphicons_free.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HtmlResources\懒人图库导航菜单升级版（兼容IE6）.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HtmlResources\404\images\LeagueGothic.eot" />
+    <None Include="HtmlResources\提示页\robo.to.htm.7z" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -86,6 +86,7 @@
     <Compile Include="ServiceLocation\Configuration\ServiceSection.cs" />
     <Compile Include="ServiceLocation\ServiceLocationConst.cs" />
     <Compile Include="ServiceLocation\ServiceLocationHandler.cs" />
+    <Compile Include="Utilities\DateTimeUtilities.cs" />
     <Compile Include="Utilities\DesCrypto.cs" />
     <Compile Include="Utilities\EnumHelper.cs" />
     <Compile Include="Utilities\ImageUtilities\ColorHelper.cs" />
