@@ -125,7 +125,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         private void RedirectToLoginUrl()
         {
             var httpContext = HttpContext.Current;
-            var redirectUrl = LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri;
+            var redirectUrl = LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsolutePath;
             _logger.DebugFormat("正跳转到登录页：{0}", redirectUrl);
             httpContext.Response.Redirect(redirectUrl);
         }
