@@ -77,15 +77,15 @@ namespace Fluent.Infrastructure.Utilities
         /// <summary>
         /// 将对象转换为Int32类型
         /// </summary>
-        /// <param name="strValue">要转换的字符串</param>
+        /// <param name="expression"></param>
         /// <param name="defValue">缺省值</param>
         /// <returns>转换后的int类型结果</returns>
-        public static int StrToInt(object Expression, int defValue)
+        public static int StrToInt(object expression, int defValue)
         {
 
-            if (Expression != null)
+            if (expression != null)
             {
-                string str = Expression.ToString();
+                string str = expression.ToString();
                 if (str.Length > 0 && str.Length <= 11 && Regex.IsMatch(str, @"^[-]?[0-9]*$"))
                 {
                     if ((str.Length < 10) || (str.Length == 10 && str[0] == '1') || (str.Length == 11 && str[0] == '-' && str[1] == '1'))

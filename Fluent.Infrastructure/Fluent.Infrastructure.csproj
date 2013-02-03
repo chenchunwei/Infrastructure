@@ -78,6 +78,10 @@
     <Compile Include="Excel\ExcelService.cs" />
     <Compile Include="Log\DefaultLoggerFactory.cs" />
     <Compile Include="Log\ILoggerFactory.cs" />
+    <Compile Include="Log\MessageContainerExtensions.cs" />
+    <Compile Include="Log\Messages\Message.cs" />
+    <Compile Include="Log\Messages\MessageContainer.cs" />
+    <Compile Include="Log\Messages\MessageType.cs" />
     <Compile Include="Mvc\BaseController.cs" />
     <Compile Include="Mvc\NewtonsoftJsonResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -99,6 +103,7 @@
     <Compile Include="Utilities\ImageUtilities\ZoomModel.cs" />
     <Compile Include="Utilities\MD5Utility.cs" />
     <Compile Include="Utilities\MyString.cs" />
+    <Compile Include="Utilities\StringExtensions.cs" />
     <Compile Include="Utilities\TypeParse.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 {
     public class AuthenticationHttpMoudle : IHttpModule
     {
-        private ILog _logger;
+        private readonly ILog _logger;
 
         private readonly IUserService _userService;
         private readonly DesCrypto _desCrypto;
@@ -38,18 +38,12 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         public void Init(HttpApplication context)
         {
             context.BeginRequest += Handler;
-            context.EndRequest += SessionClose;
         }
-        private static void SessionClose(object sender, EventArgs e)
-        {
-            var httpContext = HttpContext.Current;
-            //if (httpContext != null)
-            //    new DefaultSessionManagerFactory(new OracleSessionFactoryHelper().GetSessionFactory()).CreateManager().Dispose();
-        }
+
         public void Handler(object sender, EventArgs args)
         {
             _logger.DebugFormat("AuthenticationHttpMoudle.Handler被访问，对象实例为{0}", this.GetHashCode());
-            HttpContext httpContext = HttpContext.Current;
+            var httpContext = HttpContext.Current;
             if (httpContext == null)
                 throw new ApplicationException("context");
             if (httpContext.Request == null)
@@ -83,6 +77,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             else
             {
                 //HACK:问题，当用户已登录的时候再登入的时候，会多次加载用户信息。这个需要修正，而且比较麻烦
+                //多次加载的问题是因为样式、图片、js均会发起请求并进入Moudle进行处理
                 LoadUserProfie(accountCookie, extensionCookie);
             }
         }

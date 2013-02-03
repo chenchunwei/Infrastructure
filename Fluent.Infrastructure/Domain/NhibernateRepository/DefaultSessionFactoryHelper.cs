@@ -60,7 +60,7 @@ namespace Fluent.Infrastructure.Domain.NhibernateRepository
 
         private static IEnumerable<Assembly> GetMappingsAssemblies()
         {
-            string assemblies = System.Configuration.ConfigurationManager.AppSettings["Mappings"];
+            var assemblies = System.Configuration.ConfigurationManager.AppSettings["Mappings"];
             return assemblies.Split(',').ToList().Select(Assembly.Load);
         }
     }

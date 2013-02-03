@@ -11,17 +11,23 @@ namespace Fluent.Infrastructure.Domain.NhibernateRepository
         where TKey : IComparable
         where TAggregateRoot : IAggregateRoot
     {
-        private static readonly DefaultSessionFactoryHelper _defaultSessionFactoryHelper = new DefaultSessionFactoryHelper();
+        private readonly DefaultSessionFactoryHelper _defaultSessionFactoryHelper;
 
-        private readonly ISessionManagerFactory _sessionManagerFactory = new DefaultSessionManagerFactory(_defaultSessionFactoryHelper.GetSessionFactory());
+        private readonly ISessionManagerFactory _sessionManagerFactory;
 
-        protected ISession Session { get { return _sessionManagerFactory.CreateManager().OpenSession(); }  }
+        protected ISession Session { get { return _sessionManagerFactory.CreateManager().OpenSession(); } }
+
+        public AbstractNhibernateRepository()
+        {
+            _defaultSessionFactoryHelper = new DefaultSessionFactoryHelper();
+            _sessionManagerFactory = new DefaultSessionManagerFactory(_defaultSessionFactoryHelper.GetSessionFactory());
+        }
 
         public TAggregateRoot Find(TKey key)
         {
             return Session.Get<TAggregateRoot>(key);
         }
- 
+
         public void Update(TAggregateRoot aggregateRoot)
         {
             Session.Update(aggregateRoot);

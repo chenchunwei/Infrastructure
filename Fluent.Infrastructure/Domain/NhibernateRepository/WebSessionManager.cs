@@ -2,21 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Fluent.Infrastructure.Log;
 using NHibernate;
 using System.Web;
+using log4net;
 
 namespace Fluent.Infrastructure.Domain.NhibernateRepository
 {
     public class WebSessionManager : ISessionManager
     {
         private const string NhibernateSessionKey = "__nhibernateSessionKey__";
-
         private readonly ISessionFactory _sessionFactory;
-
+        private readonly ILog _log;
         private static readonly object Locker = new object();
 
         public WebSessionManager(ISessionFactory sessionFactory)
         {
+            _log = new DefaultLoggerFactory().GetLogger();
             _sessionFactory = sessionFactory;
         }
 
@@ -30,19 +32,24 @@ namespace Fluent.Infrastructure.Domain.NhibernateRepository
         private ISession CreateSessionThreadSafely()
         {
             if (ObtainSessionInHttpContext() == null)
+            {
                 lock (Locker)
                 {
                     if (ObtainSessionInHttpContext() == null)
                     {
                         HttpContext.Current.Items[NhibernateSessionKey] = _sessionFactory.OpenSession();
+                        _log.DebugFormat("在HttpContext中打开了Session,GetHashCode={0}", ObtainSessionInHttpContext().GetHashCode());
                     }
                 }
+            }
+            var hc = ObtainSessionInHttpContext().GetHashCode();
             return ObtainSessionInHttpContext();
         }
 
         private ISession ObtainSessionInHttpContext()
         {
-            return HttpContext.Current.Items[NhibernateSessionKey] as ISession;
+            var session = HttpContext.Current.Items[NhibernateSessionKey] as ISession;
+            return session;
         }
 
         public void Dispose()
@@ -50,6 +57,7 @@ namespace Fluent.Infrastructure.Domain.NhibernateRepository
             var session = ObtainSessionInHttpContext();
             if (session == null)
                 return;
+            _log.InfoFormat("HttpContext正回收Session,GetHashCode={0}", session.GetHashCode());
             session.Close();
             session.Dispose();
         }

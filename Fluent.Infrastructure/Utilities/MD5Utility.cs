@@ -11,7 +11,7 @@ namespace Fluent.Infrastructure.Utilities
     /// 制作人：陈春伟  2012.07.20
     /// Md5 哈希计算工具类
     /// </summary>
-    public class MD5Utility
+    public class Md5Utility
     {
         private static readonly MD5 Cryptography = MD5.Create();
 
@@ -20,9 +20,9 @@ namespace Fluent.Infrastructure.Utilities
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string GetMD5HashCode(string str)
+        public static string GetMd5HashCode(string str)
         {
-            return GetMD5HashCode(Encoding.UTF8.GetBytes(str.Trim()));
+            return GetMd5HashCode(Encoding.UTF8.GetBytes(str.Trim()));
         }
 
         /// <summary>k
@@ -30,7 +30,7 @@ namespace Fluent.Infrastructure.Utilities
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static string GetMD5HashCode(byte[] bytes)
+        public static string GetMd5HashCode(byte[] bytes)
         {
             return ConvertHashBytes2String(Cryptography.ComputeHash(bytes));
         }

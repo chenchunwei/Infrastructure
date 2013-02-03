@@ -27,9 +27,9 @@ namespace Fluent.Infrastructure.Utilities
         /// </summary>
         /// <param name="lst"></param>
         /// <returns></returns>
-        public static string convertListToString(IList<string> lst)
+        public static string ConvertListToString(IList<string> lst)
         {
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
             foreach (string s in lst)
             {
                 str.Append(s);
@@ -40,12 +40,12 @@ namespace Fluent.Infrastructure.Utilities
         /// <summary>
         /// 将对象转换为Int32类型
         /// </summary>
-        /// <param name="strValue">要转换的字符串</param>
+        /// <param name="expression"></param>
         /// <param name="defValue">缺省值</param>
         /// <returns>转换后的int类型结果</returns>
-        public static int StrToInt(object Expression, int defValue)
+        public static int StrToInt(object expression, int defValue)
         {
-            return TypeParse.StrToInt(Expression, defValue);
+            return TypeParse.StrToInt(expression, defValue);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace Fluent.Infrastructure.Utilities
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string RemoveRNString(string str)
+        public static string RemoveRnString(string str)
         {
             if (string.IsNullOrEmpty(str)) return "";
             return str.Replace("\r", "").Replace("\n", "");
@@ -315,7 +315,7 @@ namespace Fluent.Infrastructure.Utilities
         /// 截取填充字符串到多少位字符,
         /// </summary>
         /// <param name="str">原字符床</param>
-        /// <param name="n">要截取的长度</param>
+        /// <param name="length"></param>
         /// <param name="fill">超出后的填补字符串</param>
         /// <returns></returns>
         public static string StrSub(string str, int length, string fill)
@@ -338,7 +338,7 @@ namespace Fluent.Infrastructure.Utilities
         /// <returns></returns>
         public static string SubString(string str, int len, string rep)
         {
-            ASCIIEncoding ascii = new ASCIIEncoding();
+            var ascii = new ASCIIEncoding();
             int tempLen = 0;
             string tempString = "";
             if (string.IsNullOrEmpty(str))
@@ -384,7 +384,7 @@ namespace Fluent.Infrastructure.Utilities
         /// </summary>
         /// <param name="str">原始字符串</param>
         /// <returns>MD5结果</returns>
-        public static string MD5(string str)
+        public static string Md5(string str)
         {
             byte[] b = Encoding.Default.GetBytes(str);
             b = new MD5CryptoServiceProvider().ComputeHash(b);
