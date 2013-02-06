@@ -51,7 +51,10 @@
     <Compile Include="HttpFiles\FileHelper.cs" />
     <Compile Include="HttpFiles\HttpFileInfo.cs" />
     <Compile Include="HttpHandlers\ThumbnailHttppHandler.cs" />
+    <Compile Include="HttpMoudles\DefaultAuthenticationHandler.cs" />
     <Compile Include="HttpMoudles\HttpMoudlesConst.cs" />
+    <Compile Include="HttpMoudles\IAuthenticationHandler.cs" />
+    <Compile Include="HttpMoudles\LoginEntity.cs" />
     <Compile Include="HttpMoudles\User.cs" />
     <Compile Include="HttpMoudles\IUserService.cs" />
     <Compile Include="HttpMoudles\Configuration\AuthencationSection.cs" />

@@ -21,6 +21,8 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
         private readonly ILog _logger;
 
         private readonly IUserService _userService;
+        private readonly IList<IAuthenticationHandler> _systemAuthenticationHandlers;
+        private readonly IList<IAuthenticationHandler> _customAuthenticationHandlers;
         private readonly DesCrypto _desCrypto;
 
         public AuthenticationHttpMoudle()
@@ -29,6 +31,12 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             _logger.DebugFormat("AuthenticationHttpMoudle创建新的实例");
             _userService = ServiceLocationHandler.Resolver<IUserService>();
             _desCrypto = new DesCrypto("hhyjuuhd", "mmnjikjh");
+            _systemAuthenticationHandlers = new List<IAuthenticationHandler>();
+            _systemAuthenticationHandlers.Add(new DefaultAuthenticationHandler());
+            _customAuthenticationHandlers = new List<IAuthenticationHandler>();
+            var customHandler = ServiceLocationHandler.Resolver<IAuthenticationHandler>();
+            if (customHandler != null)
+                _customAuthenticationHandlers.Add(customHandler);
         }
         public void Dispose()
         {
@@ -127,6 +135,10 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 
         private void Login()
         {
+            foreach (var handler in _systemAuthenticationHandlers)
+                handler.OnLoginStart();
+            foreach (var handler in _customAuthenticationHandlers)
+                handler.OnLoginStart();
             ////HACK:改成配置项 不要写死在程序中
             var httpContext = HttpContext.Current;
             var account = httpContext.Request["account"];
@@ -134,6 +146,13 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             var extension = httpContext.Request["extension"];
             var user = _userService.Authencation(account, password, extension);
             _logger.DebugFormat("正在验证登录信息：{0}", account);
+            string redirectUrl;
+            bool isLoginSuccess;
+            var urlReferrer = httpContext.Request.UrlReferrer;
+            var urlrefInQuery = httpContext.Request["urlReferrer"];
+            var refUrl = string.IsNullOrEmpty(urlrefInQuery) ? (urlReferrer != null ? urlReferrer.AbsoluteUri : string.Empty) : urlrefInQuery;
+            var loginEntity = new LoginEntity();
+            loginEntity.ReferrerUrl = refUrl;
             if (user != null)
             {
                 httpContext.Items[HttpMoudlesConst.HttpUserKey] = user;
@@ -142,26 +161,37 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
                 httpContext.Response.Cookies.Add(loginCookie);
                 httpContext.Response.Cookies.Add(loginExtensionCookie);
 
-                var urlReferrer = httpContext.Request.UrlReferrer;
-                var urlrefInQuery = httpContext.Request["urlReferrer"];
-                var refUrl = string.IsNullOrEmpty(urlrefInQuery) ? (urlReferrer != null ? urlReferrer.AbsoluteUri : string.Empty) : string.Empty;
+               
                 _logger.DebugFormat("urlrefInQuery：{0}", urlrefInQuery);
                 _logger.DebugFormat("urlReferrer：{0}", urlReferrer);
                 if (!string.IsNullOrEmpty(refUrl))
                 {
-                    if (refUrl.IndexOf(LoginUrl.Replace("~/", ""), System.StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    if (refUrl.IndexOf(LoginUrl.Replace("~/", ""), StringComparison.CurrentCultureIgnoreCase) >= 0)
                     {
                         refUrl = ConvertUrl(HomeUrl);
                     }
                 }
-                _logger.DebugFormat("正跳转到：{0}", refUrl);
-                httpContext.Response.Redirect(!string.IsNullOrEmpty(refUrl) ? refUrl : ConvertUrl(refUrl));
+                redirectUrl = !string.IsNullOrEmpty(refUrl) ? refUrl : ConvertUrl(refUrl);
+                isLoginSuccess = true;
             }
             else
             {
                 _logger.DebugFormat("用户名密码校验不通过：account={0};pwd={1},跳转到登录页并记录状态", account, password);
-                httpContext.Response.Redirect(LoginUrl + string.Format("?status={0}", "0"));
+                redirectUrl = LoginUrl + string.Format("?status={0}", "0");
+                isLoginSuccess = false;
             }
+
+            loginEntity.RedirectUrl = redirectUrl;
+            loginEntity.Extension = extension;
+            loginEntity.UserName = account;
+            loginEntity.Pwd = password;
+            loginEntity.IsLoginSuccess = isLoginSuccess;
+
+            foreach (var handler in _systemAuthenticationHandlers)
+                handler.OnLoginEnd(loginEntity);
+            foreach (var handler in _customAuthenticationHandlers)
+                handler.OnLoginEnd(loginEntity);
+            httpContext.Response.Redirect(redirectUrl);
         }
 
         private static void RemoveLoginCookie(HttpContext httpContext, HttpCookie accountCookie, HttpCookie loginExtensionCookie)
@@ -177,19 +207,28 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
 
         private void Logout()
         {
+            foreach (var handler in _systemAuthenticationHandlers)
+                handler.OnLogoutBegin();
+            foreach (var handler in _customAuthenticationHandlers)
+                handler.OnLogoutBegin();
             _logger.DebugFormat("正在执行退出操作！");
-            HttpContext httpContext = HttpContext.Current;
+            var httpContext = HttpContext.Current;
             var accountCookie = httpContext.Request.Cookies[LoginCookieKey];
             var loginExtensionCookie = httpContext.Request.Cookies[LoginExtensionCookieKey];
+            var redirectUrl = string.Empty;
             if (accountCookie != null)
             {
                 RemoveLoginCookie(httpContext, accountCookie, loginExtensionCookie);
-                //跳转到新登录页
-                //httpContext.Response.Redirect(LoginUrl + "?urlReferrer=" + httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), ""));
-                var logoutUrl = httpContext.Request.Url.AbsoluteUri.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), "");
-                _logger.DebugFormat("退出成功，正跳转：{0}", logoutUrl);
-                httpContext.Response.Redirect(logoutUrl);
+                redirectUrl = httpContext.Request.Url.AbsolutePath.Replace(string.Format("?{0}={1}", LogoutParam, LogoutValue), "");
+                _logger.DebugFormat("退出成功，正跳转：{0}", redirectUrl);
             }
+            foreach (var handler in _systemAuthenticationHandlers)
+                handler.OnLogoutEnd();
+            foreach (var handler in _customAuthenticationHandlers)
+                handler.OnLogoutEnd();
+            if (!string.IsNullOrEmpty(redirectUrl))
+                httpContext.Response.Redirect(redirectUrl);
+
         }
 
         private string FormatUrlParam(string url, string parma)

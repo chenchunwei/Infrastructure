@@ -11,7 +11,7 @@ namespace Fluent.Infrastructure.Domain.NhibernateRepository
 {
     public class WebSessionManager : ISessionManager
     {
-        private const string NhibernateSessionKey = "__nhibernateSessionKey__";
+        public const string NhibernateSessionKey = "__nhibernateSessionKey__";
         private readonly ISessionFactory _sessionFactory;
         private readonly ILog _log;
         private static readonly object Locker = new object();
