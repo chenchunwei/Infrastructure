@@ -82,6 +82,12 @@
     <Compile Include="Log\Messages\Message.cs" />
     <Compile Include="Log\Messages\MessageContainer.cs" />
     <Compile Include="Log\Messages\MessageType.cs" />
+    <Compile Include="Mails\MailAttachments.cs" />
+    <Compile Include="Mails\MailFormat.cs" />
+    <Compile Include="Mails\MailMessage.cs" />
+    <Compile Include="Mails\MailPriority.cs" />
+    <Compile Include="Mails\SmtpServerHelper.cs" />
+    <Compile Include="Mails\SmtpMail.cs" />
     <Compile Include="Mvc\BaseController.cs" />
     <Compile Include="Mvc\NewtonsoftJsonResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -34,7 +34,7 @@ namespace Fluent.Infrastructure.Web.HttpMoudles
             _systemAuthenticationHandlers = new List<IAuthenticationHandler>();
             _systemAuthenticationHandlers.Add(new DefaultAuthenticationHandler());
             _customAuthenticationHandlers = new List<IAuthenticationHandler>();
-            var customHandler = ServiceLocationHandler.Resolver<IAuthenticationHandler>();
+            var customHandler = ServiceLocationHandler.Resolver<IAuthenticationHandler>(false);
             if (customHandler != null)
                 _customAuthenticationHandlers.Add(customHandler);
         }

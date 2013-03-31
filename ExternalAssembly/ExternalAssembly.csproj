@@ -47,6 +47,12 @@
     <Content Include="Aspose\Aspose.Words.xml" />
     <Content Include="FluentNhibernate\FluentNHibernate.dll" />
     <Content Include="FluentNhibernate\FluentNHibernate.pdb" />
+    <Content Include="HtmlParser.Net\htmlparser-default.xml" />
+    <Content Include="HtmlParser.Net\htmlparser-site.xml" />
+    <Content Include="HtmlParser.Net\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="HtmlParser.Net\Winista.HtmlParser.dll" />
+    <Content Include="JMail\Dimac.JMail.dll" />
+    <Content Include="JMail\Dimac.JMail.Smtp.dll" />
     <Content Include="JSON.NET\Newtonsoft.Json.dll" />
     <Content Include="JSON.NET\Newtonsoft.Json.pdb" />
     <Content Include="JSON.NET\Newtonsoft.Json.xml" />
@@ -79,6 +85,9 @@
     <Content Include="Quartz.Net\Quartz.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="JMail\Dimac.JMail.chm" />
+    <None Include="JMail\Examples.zip" />
+    <None Include="JMail\JmailNETfree-v1.1.zip" />
     <None Include="PetaPoco\PetaPoco.dll.config" />
   </ItemGroup>
   <ItemGroup />
